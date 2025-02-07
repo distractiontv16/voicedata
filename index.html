@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Siri Fon Bénin</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+          integrity="sha512-..." 
+          crossorigin="anonymous" 
+          referrerpolicy="no-referrer"
+          media="print" onload="this.media='all'">
+    <link rel="preload" as="script" href="assets/js/app.js">
+    <link rel="preload" as="script" href="assets/js/recorder.js">
 </head>
 <body>
     <header>
@@ -116,8 +122,8 @@
         </div>
     </main>
 
-    <script src="assets/js/recorder.js"></script>
-    <script src="assets/js/telegram.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/recorder.js" defer></script>
+    <script src="assets/js/telegram.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
 </body>
 </html>
