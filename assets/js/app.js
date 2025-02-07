@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Créer l'instance de AudioRecorder
+    const audioRecorder = new AudioRecorder();
+
     // Éléments DOM
     const recordBtn = document.getElementById('recordBtn');
     const pauseBtn = document.getElementById('pauseBtn');
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variables d'état
     let isRecording = false;
     let currentExampleAudio = null;
-    const phrases = ['Appel_Nom', 'Phrase_2', 'Phrase_3', 'Phrase_4']; // Ajoutez vos phrases ici
+    const phrases = ['Appel_Nom', 'Decroche_L\'appel', 'Ouvre_whatsapp', 'Ouvre_galerie'];
     let currentPhraseIndex = 0;
     const recordings = new Map(); // Pour stocker les enregistrements
 
@@ -170,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (started) {
                 isRecording = true;
                 updateUIForRecording(true);
+                stopBtn.disabled = false;
             }
         }
     });
@@ -186,7 +190,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopBtn.addEventListener('click', () => {
         if (isRecording) {
-            audioRecorder.stopRecording();
+            audioRecorder.stopRecording()
+                .then(blob => {
+                    if (blob) {
+                        handleRecordingComplete(blob);
+                    }
+                    isRecording = false;
+                    updateUIForRecording(false);
+                    stopBtn.disabled = true;
+                });
         }
     });
 
@@ -212,7 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCurrentPhrase();
         }
         
+        // Réinitialiser l'interface
+        isRecording = false;
         updateUIForRecording(false);
+        stopBtn.disabled = true;
+        timerDisplay.textContent = '00:00';
         updateSubmitButton();
     }
 
@@ -267,9 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '<i class="fas fa-microphone-slash"></i>' : 
             '<i class="fas fa-microphone"></i>';
         
-        pauseBtn.disabled = !isRecording;
         stopBtn.disabled = !isRecording;
-        deleteBtn.disabled = !isRecording;
         playExampleBtn.disabled = isRecording;
         
         // Désactiver les sélecteurs pendant l'enregistrement

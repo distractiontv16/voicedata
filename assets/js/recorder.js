@@ -4,7 +4,7 @@ class AudioRecorder {
         this.audioChunks = [];
         this.isRecording = false;
         this.isPaused = false;
-        this.maxDuration = 5000; // 5 secondes en millisecondes
+        this.maxDuration = 3000; // Changé de 5000 à 3000 millisecondes (3 secondes)
         this.timer = null;
     }
 
@@ -44,7 +44,7 @@ class AudioRecorder {
                 const elapsed = Date.now() - startTime;
                 onTimerUpdate(elapsed);
 
-                // Arrêter automatiquement après 5 secondes
+                // Arrêter automatiquement après 3 secondes
                 if (elapsed >= this.maxDuration) {
                     this.stopRecording(onRecordingComplete);
                 }
@@ -130,6 +130,3 @@ class AudioRecorder {
         return `${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
     }
 }
-
-// Créer une instance globale du recorder
-const audioRecorder = new AudioRecorder();
