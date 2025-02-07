@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siri Fon Bénin</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <h1>Siri Fon Bénin</h1>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>🎙️ Participez à la création du premier assistant vocal en langue Fon ! 🌍</h2>
+            <div class="scrolling-texts" id="scrollingTexts">
+                <p>🎯 C'est rapide : 5 secondes, comme un vocal WhatsApp</p>
+                <p>🔒 Promis, c'est safe : pas de spam, pas de fuite de données</p>
+                <p>🎤 En 5 secondes chrono, enregistrez une phrase en Fon</p>
+            </div>
+        </section>
+
+        <section class="recording-options">
+            <div class="options-container">
+                <div class="select-group">
+                    <label for="phraseSelect">Phrase</label>
+                    <select id="phraseSelect">
+                        <option value="Appel_Nom">Appel_Nom</option>
+                        <option value="Decroche_lappel">Decroche_lappel</option>
+                        <option value="Ouvre_galerie">Ouvre_galerie</option>
+                        <option value="Ouvre_Whatsap">Ouvre_Whatsap</option>
+                    </select>
+                </div>
+
+                <div class="select-group">
+                    <label for="ageSelect">Tranche d'âge</label>
+                    <select id="ageSelect">
+                        <option value="15-20">15-20</option>
+                        <option value="21-30">21-30</option>
+                        <option value="31-40">31-40</option>
+                        <option value="41-50">41-50</option>
+                        <option value="51+">51+</option>
+                    </select>
+                </div>
+
+                <div class="select-group">
+                    <label for="environmentSelect">Environnement</label>
+                    <select id="environmentSelect">
+                        <option value="Calme">Calme</option>
+                        <option value="Bruyant">Bruyant</option>
+                        <option value="Très bruyant">Très bruyant</option>
+                    </select>
+                </div>
+
+                <button id="playExampleBtn" class="example-btn">
+                    <i class="fas fa-play"></i> Écouter l'exemple
+                </button>
+                <div class="progress-bar" id="audioProgress"></div>
+            </div>
+        </section>
+
+        <section class="recording-controls">
+            <div class="timer" id="timer">00:00</div>
+            <div class="controls-container">
+                <button id="recordBtn" class="record-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="pauseBtn" class="control-btn" disabled>
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button id="stopBtn" class="control-btn" disabled>
+                    <i class="fas fa-stop"></i>
+                </button>
+                <button id="deleteBtn" class="control-btn" disabled>
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="privacy-info">
+            <div class="info-container">
+                <p>✨ Nous ne garderons aucun enregistrement de vous</p>
+                <p>🔐 Votre voix ne sera utilisée QUE pour ce projet</p>
+                <p>👤 Aucun nom ou photo ne sera stocké</p>
+            </div>
+        </section>
+
+        <!-- Modal de remerciement -->
+        <div id="thankYouModal" class="modal">
+            <div class="modal-content">
+                <h2>Merci pour votre contribution ! 🎉</h2>
+                <div class="modal-body">
+                    <p>Votre enregistrement a été envoyé avec succès.</p>
+                    <p>Aidez-nous à faire grandir la communauté en partageant :</p>
+                    <div class="share-buttons">
+                        <button class="share-btn facebook" onclick="shareToSocial('facebook')">
+                            <i class="fab fa-facebook"></i>
+                        </button>
+                        <button class="share-btn whatsapp" onclick="shareToSocial('whatsapp')">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                        <button class="share-btn share" onclick="shareToSocial('other')">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeThankYouModal()">Fermer</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="assets/js/recorder.js"></script>
+    <script src="assets/js/telegram.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+/* Styles pour les petits écrans mobiles */
+@media screen and (max-width: 480px) {
+    .hero h2 {
+        font-size: 1.4rem;
+        padding: 0 1rem;
+    }
+
+    .scrolling-texts {
+        height: 80px; /* Plus d'espace pour le texte sur mobile */
+    }
+
+    .scrolling-texts p {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+
+    .recording-options {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+
+    .select-group label {
+        font-size: 0.9rem;
+    }
+
+    select {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .example-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .timer {
+        font-size: 1.5rem;
+    }
+
+    .record-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+
+    .control-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 0.8rem;
+    }
+
+    .modal-content {
+        margin: 30% auto;
+        padding: 1.5rem;
+    }
+
+    .share-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Styles pour les tablettes */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .hero h2 {
+        font-size: 1.6rem;
+    }
+
+    .recording-options {
+        margin: 0.8rem;
+    }
+
+    .modal-content {
+        margin: 20% auto;
+    }
+}
+
+/* Styles pour les grands écrans */
+@media screen and (min-width: 769px) {
+    .hero h2 {
+        font-size: 2rem;
+    }
+
+    .options-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .example-btn {
+        grid-column: span 2;
+    }
+
+    .progress-bar {
+        grid-column: span 2;
+    }
+
+    .controls-container {
+        gap: 2rem;
+    }
+
+    /* Animation de survol pour les grands écrans */
+    .control-btn:hover:not(:disabled) {
+        transform: scale(1.1);
+        background-color: var(--secondary-color);
+    }
+}
+
+/* Styles pour les très grands écrans */
+@media screen and (min-width: 1200px) {
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .hero h2 {
+        font-size: 2.2rem;
+    }
+
+    .scrolling-texts {
+        height: 70px;
+    }
+
+    .scrolling-texts p {
+        font-size: 1.2rem;
+    }
+
+    .options-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .example-btn {
+        grid-column: span 3;
+    }
+
+    .progress-bar {
+        grid-column: span 3;
+    }
+}
+
+/* Styles pour le mode sombre (si le système le supporte) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #bb86fc;
+        --secondary-color: #3700b3;
+        --text-color: #ffffff;
+        --light-bg: #121212;
+        --white: #1e1e1e;
+    }
+
+    body {
+        background-color: #121212;
+    }
+
+    .recording-options,
+    .privacy-info,
+    .modal-content {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+
+    select {
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border-color: #333;
+    }
+
+    .progress-bar {
+        background-color: #333;
+    }
+
+    .info-container p {
+        color: #ffffff;
+    }
+}
+
+/* Styles pour réduire les animations si l'utilisateur le préfère */
+@media (prefers-reduced-motion: reduce) {
+    .scrolling-texts p {
+        animation: none;
+        opacity: 1;
+        position: static;
+    }
+
+    .record-btn.recording {
+        animation: none;
+    }
+
+    .share-btn:hover,
+    .control-btn:hover,
+    .record-btn:hover {
+        transform: none;
+    }
+}

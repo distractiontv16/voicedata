@@ -1,0 +1,308 @@
+/* Variables globales */
+:root {
+    --primary-color: #6200ee;
+    --secondary-color: #3700b3;
+    --text-color: #333;
+    --light-bg: #f5f5f5;
+    --white: #ffffff;
+    --error-color: #dc3545;
+    --success-color: #28a745;
+}
+
+/* Reset et styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--light-bg);
+}
+
+/* Header */
+header {
+    background-color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.logo-container img {
+    height: 40px;
+    width: auto;
+}
+
+.logo-container h1 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.hero h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.scrolling-texts {
+    overflow: hidden;
+    height: 60px;
+    position: relative;
+}
+
+.scrolling-texts p {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    animation: scrollText 12s infinite;
+    opacity: 0;
+}
+
+.scrolling-texts p:nth-child(1) { animation-delay: 0s; }
+.scrolling-texts p:nth-child(2) { animation-delay: 4s; }
+.scrolling-texts p:nth-child(3) { animation-delay: 8s; }
+
+@keyframes scrollText {
+    0%, 20% { opacity: 0; transform: translateY(20px); }
+    25%, 45% { opacity: 1; transform: translateY(0); }
+    50%, 100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Recording Options */
+.recording-options {
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    margin: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.options-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.select-group {
+    margin-bottom: 1.5rem;
+}
+
+.select-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--white);
+}
+
+.example-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.example-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.progress-bar {
+    height: 4px;
+    background-color: #ddd;
+    margin-top: 1rem;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 0;
+    background-color: var(--primary-color);
+    transition: width 0.1s linear;
+}
+
+/* Recording Controls */
+.recording-controls {
+    text-align: center;
+    padding: 2rem;
+}
+
+.timer {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.controls-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.record-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--error-color);
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.record-btn:hover {
+    transform: scale(1.1);
+}
+
+.record-btn.recording {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: none;
+    color: var(--white);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.control-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Privacy Info */
+.privacy-info {
+    background-color: var(--white);
+    padding: 2rem;
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.info-container p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: var(--white);
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.share-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.share-btn:hover {
+    transform: scale(1.1);
+}
+
+.share-btn.facebook { background-color: #1877f2; }
+.share-btn.whatsapp { background-color: #25d366; }
+.share-btn.share { background-color: #666; }
+
+.close-btn {
+    padding: 0.8rem 2rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+    background-color: var(--secondary-color);
+}
