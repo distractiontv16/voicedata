@@ -72,7 +72,7 @@ header {
     position: absolute;
     width: 100%;
     text-align: center;
-    animation: scrollText 12s infinite;
+    animation: scrollText 9s infinite;
     opacity: 0;
     margin: 0;
     padding: 0 1rem;
@@ -80,8 +80,8 @@ header {
 }
 
 .scrolling-texts p:nth-child(1) { animation-delay: 0s; }
-.scrolling-texts p:nth-child(2) { animation-delay: 4s; }
-.scrolling-texts p:nth-child(3) { animation-delay: 8s; }
+.scrolling-texts p:nth-child(2) { animation-delay: 3s; }
+.scrolling-texts p:nth-child(3) { animation-delay: 6s; }
 
 @media screen and (max-width: 768px) {
     .scrolling-texts {
@@ -89,7 +89,7 @@ header {
     }
 
     .scrolling-texts p {
-        font-size: 0.85rem;
+        font-size: 1.1rem;
         line-height: 1.4;
         padding: 0 0.5rem;
     }

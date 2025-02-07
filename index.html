@@ -141,5 +141,43 @@
     <script src="assets/js/recorder.js" defer></script>
     <script src="assets/js/telegram.js" defer></script>
     <script src="assets/js/app.js" defer></script>
+    <script>
+        window.shareToSocial = function(platform) {
+            const shareText = "🎤 Participez à la création de SAGBO, le premier assistant vocal en langue Fon ! C'est rapide (12 secondes) et facile. Votre voix compte ! 🌍";
+            const shareUrl = window.location.href;
+            
+            let shareLink;
+            
+            switch(platform) {
+                case 'facebook':
+                    shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+                    window.open(shareLink, '_blank', 'width=600,height=400');
+                    break;
+                
+                case 'whatsapp':
+                    shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+                    window.open(shareLink, '_blank');
+                    break;
+                
+                case 'other':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'SAGBO - Assistant Vocal Fon',
+                            text: shareText,
+                            url: shareUrl
+                        }).catch(console.error);
+                    } else {
+                        const tempInput = document.createElement('input');
+                        tempInput.value = shareUrl;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+                        alert('Lien copié dans le presse-papier !');
+                    }
+                    break;
+            }
+        }
+    </script>
 </body>
 </html>
