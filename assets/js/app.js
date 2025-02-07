@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const phraseSelect = document.getElementById('phraseSelect');
     const ageSelect = document.getElementById('ageSelect');
     const environmentSelect = document.getElementById('environmentSelect');
+    const playRecordingBtn = document.getElementById('playRecordingBtn');
+    const submitBtn = document.getElementById('submitBtn');
 
     // Variables d'état
     let isRecording = false;
@@ -92,7 +94,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gestion de la fin d'enregistrement
     async function handleRecordingComplete(audioBlob) {
         if (!audioBlob) return;
+        
+        // Activer les boutons de lecture et de validation
+        playRecordingBtn.disabled = false;
+        submitBtn.disabled = false;
+        
+        // Désactiver les boutons d'enregistrement
+        updateUIForRecording(false);
+    }
 
+    // Écouter l'enregistrement
+    playRecordingBtn.addEventListener('click', () => {
+        if (audioRecorder.isPlaying) {
+            audioRecorder.stopPlayback();
+            playRecordingBtn.innerHTML = '<i class="fas fa-play"></i>';
+        } else {
+            audioRecorder.playRecording().then(() => {
+                playRecordingBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                
+                // Remettre le bouton play quand l'audio est terminé
+                audioRecorder.audio.addEventListener('ended', () => {
+                    playRecordingBtn.innerHTML = '<i class="fas fa-play"></i>';
+                });
+            });
+        }
+    });
+
+    // Gestion de la validation et de l'envoi
+    submitBtn.addEventListener('click', async () => {
         const metadata = {
             phrase: phraseSelect.value,
             ageRange: ageSelect.value,
@@ -101,18 +130,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            
             // Envoi à Telegram
-            await telegramService.sendAudioToTelegram(audioBlob, metadata);
+            await telegramService.sendAudioToTelegram(audioRecorder.audioBlob, metadata);
             
             // Afficher le modal de remerciement
             showThankYouModal();
         } catch (error) {
             console.error('Erreur lors de l\'envoi:', error);
             alert('Une erreur est survenue lors de l\'envoi de l\'enregistrement. Veuillez réessayer.');
+            submitBtn.disabled = false;
         } finally {
             resetUI();
         }
-    }
+    });
 
     // Fonctions UI
     function updateUIForRecording(isRecording) {
@@ -137,6 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUIForRecording(false);
         timerDisplay.textContent = '00:00';
         audioProgress.style.width = '0%';
+        playRecordingBtn.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Valider et envoyer';
     }
 
     // Gestion du modal de remerciement

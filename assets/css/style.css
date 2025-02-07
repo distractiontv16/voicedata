@@ -216,6 +216,41 @@ select {
     cursor: not-allowed;
 }
 
+/* Nouveaux styles pour le bouton de validation */
+.validation-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background-color: var(--success-color); /* Utilisation de la variable existante */
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.control-btn .fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Privacy Info */
 .privacy-info {
     background-color: var(--white);
