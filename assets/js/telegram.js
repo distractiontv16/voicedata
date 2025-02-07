@@ -14,9 +14,17 @@ class TelegramService {
         try {
             const formData = new FormData();
             
-            // Création d'un nom de fichier unique
-            const timestamp = new Date().getTime();
-            const fileName = `audio_${metadata.phrase}_${timestamp}.wav`;
+            // Création d'un nom de fichier formaté
+            const phraseNumber = {
+                'Appel_Nom': '01',
+                'Decroche_Lappel': '02',
+                'Ouvre_Whatsap': '03',
+                'Ouvre_galerie': '04'
+            };
+            
+            // Format: 01-Appel_Nom-21-30-Calme.wav
+            const fileName = `${phraseNumber[metadata.phrase]}-${metadata.phrase}-${metadata.ageRange}-${metadata.environment}.wav`;
+            
             const audioFile = new File([audioBlob], fileName, { type: 'audio/wav' });
             
             formData.append('audio', audioFile);

@@ -4,14 +4,25 @@ class AudioRecorder {
         this.audioChunks = [];
         this.isRecording = false;
         this.isPaused = false;
-        this.maxDuration = 3000; // Changé de 5000 à 3000 millisecondes (3 secondes)
+        this.maxDuration = 3000; // 3 secondes
         this.timer = null;
+        this.stream = null; // Ajout pour garder une référence au stream
     }
 
     async init() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.mediaRecorder = new MediaRecorder(stream);
+            this.stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    channelCount: 1,
+                    sampleRate: 44100,
+                    sampleSize: 16
+                }
+            });
+            
+            this.mediaRecorder = new MediaRecorder(this.stream, {
+                mimeType: 'audio/webm;codecs=opus',
+                audioBitsPerSecond: 128000
+            });
             
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -35,7 +46,9 @@ class AudioRecorder {
         this.audioChunks = [];
         this.isRecording = true;
         this.isPaused = false;
-        this.mediaRecorder.start(10); // Capture les données toutes les 10ms
+        
+        // Demander des données plus fréquemment
+        this.mediaRecorder.start(100); // Capture toutes les 100ms
 
         // Démarrer le timer
         let startTime = Date.now();
@@ -75,13 +88,17 @@ class AudioRecorder {
 
         return new Promise((resolve) => {
             this.mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                // Convertir en WAV avec la bonne durée
+                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                
+                // Convertir WebM en WAV
+                const wavBlob = await this.convertToWAV(audioBlob);
                 
                 if (onComplete) {
-                    onComplete(audioBlob);
+                    onComplete(wavBlob);
                 }
                 
-                resolve(audioBlob);
+                resolve(wavBlob);
             };
 
             this.mediaRecorder.stop();
@@ -99,6 +116,73 @@ class AudioRecorder {
             this.audioChunks = [];
             clearInterval(this.timer);
         }
+    }
+
+    // Nouvelle méthode pour convertir en WAV
+    async convertToWAV(webmBlob) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await webmBlob.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        
+        const numberOfChannels = 1;
+        const length = audioBuffer.length;
+        const sampleRate = audioBuffer.sampleRate;
+        const wavBuffer = audioContext.createBuffer(numberOfChannels, length, sampleRate);
+        
+        // Copier les données audio
+        const channelData = audioBuffer.getChannelData(0);
+        wavBuffer.copyToChannel(channelData, 0);
+        
+        // Convertir en WAV
+        const wavBlob = await this.bufferToWAV(wavBuffer);
+        return wavBlob;
+    }
+
+    // Méthode pour créer un fichier WAV
+    bufferToWAV(buffer) {
+        const numberOfChannels = buffer.numberOfChannels;
+        const sampleRate = buffer.sampleRate;
+        const format = 1; // PCM
+        const bitDepth = 16;
+        
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+        
+        const wavBuffer = new ArrayBuffer(44 + buffer.length * bytesPerSample);
+        const view = new DataView(wavBuffer);
+        
+        // WAV Header
+        const writeString = (view, offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+        
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + buffer.length * bytesPerSample, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, buffer.length * bytesPerSample, true);
+        
+        const samples = new Float32Array(buffer.length);
+        buffer.copyFromChannel(samples, 0, 0);
+        
+        let offset = 44;
+        for (let i = 0; i < buffer.length; i++) {
+            const sample = Math.max(-1, Math.min(1, samples[i]));
+            view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            offset += 2;
+        }
+        
+        return new Blob([wavBuffer], { type: 'audio/wav' });
     }
 
     // Fonction pour jouer l'exemple audio

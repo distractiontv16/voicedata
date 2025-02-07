@@ -4,16 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Éléments DOM
     const recordBtn = document.getElementById('recordBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const deleteBtn = document.getElementById('deleteBtn');
     const timerDisplay = document.getElementById('timer');
     const playExampleBtn = document.getElementById('playExampleBtn');
     const audioProgress = document.getElementById('audioProgress');
-    const phraseSelect = document.getElementById('phraseSelect');
     const ageSelect = document.getElementById('ageSelect');
     const environmentSelect = document.getElementById('environmentSelect');
-    const playRecordingBtn = document.getElementById('playRecordingBtn');
     const submitBtn = document.getElementById('submitBtn');
     const currentPhraseElement = document.getElementById('currentPhrase');
     const currentPhraseNumber = document.getElementById('currentPhraseNumber');
@@ -25,7 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variables d'état
     let isRecording = false;
     let currentExampleAudio = null;
-    const phrases = ['Appel_Nom', 'Decroche_L\'appel', 'Ouvre_whatsapp', 'Ouvre_galerie'];
+    const phrases = [
+        'Appel_Nom',
+        'Decroche_Lappel',
+        'Ouvre_Whatsap',
+        'Ouvre_galerie'
+    ];
     let currentPhraseIndex = 0;
     const recordings = new Map(); // Pour stocker les enregistrements
 
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCurrentPhrase() {
         currentPhraseElement.textContent = phrases[currentPhraseIndex];
         currentPhraseNumber.textContent = (currentPhraseIndex + 1).toString();
-        submitBtn.innerHTML = `<i class="fas fa-check"></i> Valider et envoyer (${recordings.size}/4)`;
+        updateSubmitButton();
     }
 
     // Créer un élément d'enregistrement
@@ -136,27 +137,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gestion de l'exemple audio
     playExampleBtn.addEventListener('click', async () => {
-        if (currentExampleAudio && !currentExampleAudio.paused) {
-            currentExampleAudio.pause();
-            currentExampleAudio.currentTime = 0;
-            playExampleBtn.innerHTML = '<i class="fas fa-play"></i> Écouter l\'exemple';
-            audioProgress.style.width = '0%';
-            return;
-        }
+        try {
+            if (currentExampleAudio) {
+                currentExampleAudio.pause();
+                currentExampleAudio.currentTime = 0;
+            }
 
-        playExampleBtn.innerHTML = '<i class="fas fa-stop"></i> Arrêter';
-        currentExampleAudio = await audioRecorder.playExample(phrases[currentPhraseIndex]);
-        
-        if (currentExampleAudio) {
-            currentExampleAudio.addEventListener('timeupdate', () => {
-                const progress = (currentExampleAudio.currentTime / currentExampleAudio.duration) * 100;
-                audioProgress.style.width = `${progress}%`;
-            });
+            const currentPhrase = phrases[currentPhraseIndex];
+            console.log('Playing example for:', currentPhrase); // Pour le débogage
+            
+            currentExampleAudio = await audioRecorder.playExample(currentPhrase);
+            
+            if (currentExampleAudio) {
+                currentExampleAudio.onplay = () => {
+                    playExampleBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    audioProgress.style.width = '0%';
+                };
 
-            currentExampleAudio.addEventListener('ended', () => {
-                playExampleBtn.innerHTML = '<i class="fas fa-play"></i> Écouter l\'exemple';
-                audioProgress.style.width = '0%';
-            });
+                currentExampleAudio.onended = () => {
+                    playExampleBtn.innerHTML = '<i class="fas fa-play"></i> Écouter l\'exemple';
+                    audioProgress.style.width = '100%';
+                };
+
+                currentExampleAudio.ontimeupdate = () => {
+                    const progress = (currentExampleAudio.currentTime / currentExampleAudio.duration) * 100;
+                    audioProgress.style.width = `${progress}%`;
+                };
+            }
+        } catch (error) {
+            console.error('Erreur lors de la lecture de l\'exemple:', error);
+            alert('Impossible de lire l\'exemple audio.');
         }
     });
 
@@ -178,16 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    pauseBtn.addEventListener('click', () => {
-        if (audioRecorder.isPaused) {
-            audioRecorder.resumeRecording();
-            pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            audioRecorder.pauseRecording();
-            pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    });
-
     stopBtn.addEventListener('click', () => {
         if (isRecording) {
             audioRecorder.stopRecording()
@@ -200,11 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     stopBtn.disabled = true;
                 });
         }
-    });
-
-    deleteBtn.addEventListener('click', () => {
-        audioRecorder.cancelRecording();
-        resetUI();
     });
 
     // Gestion de la fin d'enregistrement
@@ -232,50 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSubmitButton();
     }
 
-    // Écouter l'enregistrement
-    playRecordingBtn.addEventListener('click', () => {
-        if (audioRecorder.isPlaying) {
-            audioRecorder.stopPlayback();
-            playRecordingBtn.innerHTML = '<i class="fas fa-play"></i>';
-        } else {
-            audioRecorder.playRecording().then(() => {
-                playRecordingBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                
-                // Remettre le bouton play quand l'audio est terminé
-                audioRecorder.audio.addEventListener('ended', () => {
-                    playRecordingBtn.innerHTML = '<i class="fas fa-play"></i>';
-                });
-            });
-        }
-    });
-
-    // Gestion de la validation et de l'envoi
-    submitBtn.addEventListener('click', async () => {
-        if (recordings.size !== 4) return;
-
-        const metadata = {
-            ageRange: ageSelect.value,
-            environment: environmentSelect.value,
-            timestamp: new Date().toISOString()
-        };
-
-        try {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
-            
-            // Envoyer chaque enregistrement
-            for (const [phrase, blob] of recordings) {
-                await telegramService.sendAudioToTelegram(blob, { ...metadata, phrase });
-            }
-            
-            showThankYouModal();
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi:', error);
-            alert('Une erreur est survenue lors de l\'envoi des enregistrements. Veuillez réessayer.');
-            submitBtn.disabled = false;
-        }
-    });
-
     // Fonctions UI
     function updateUIForRecording(isRecording) {
         recordBtn.classList.toggle('recording', isRecording);
@@ -287,31 +238,52 @@ document.addEventListener('DOMContentLoaded', () => {
         playExampleBtn.disabled = isRecording;
         
         // Désactiver les sélecteurs pendant l'enregistrement
-        phraseSelect.disabled = isRecording;
         ageSelect.disabled = isRecording;
         environmentSelect.disabled = isRecording;
     }
 
-    function resetUI() {
-        isRecording = false;
-        updateUIForRecording(false);
-        timerDisplay.textContent = '00:00';
-        audioProgress.style.width = '0%';
-        playRecordingBtn.disabled = true;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-check"></i> Valider et envoyer';
-    }
+    // Gestion de la validation et de l'envoi
+    submitBtn.addEventListener('click', async () => {
+        if (recordings.size !== 4) return;
 
-    // Fonctions pour gérer le modal
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+            
+            // Envoyer chaque enregistrement
+            for (const [phrase, blob] of recordings) {
+                const metadata = {
+                    phrase: phrase,
+                    ageRange: ageSelect.value,
+                    environment: environmentSelect.value,
+                    timestamp: new Date().toISOString()
+                };
+
+                await telegramService.sendAudioToTelegram(blob, metadata);
+            }
+            
+            // Afficher le modal de remerciement
+            showThankYouModal();
+            
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi:', error);
+            alert('Une erreur est survenue lors de l\'envoi des enregistrements. Veuillez réessayer.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Valider et envoyer (4/4)';
+        }
+    });
+
+    // Fonction pour afficher le modal de remerciement
     function showThankYouModal() {
         const modal = document.getElementById('thankYouModal');
         modal.style.display = 'block';
     }
 
+    // Fonction pour fermer le modal de remerciement
     window.closeThankYouModal = function() {
         const modal = document.getElementById('thankYouModal');
         modal.style.display = 'none';
-        // Optionnel : recharger la page pour recommencer
+        // Recharger la page pour recommencer
         window.location.reload();
     };
 
@@ -334,4 +306,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialisation
     updateCurrentPhrase();
+
+    // Fonction de partage
+    function shareToSocial(platform) {
+        const shareText = "🎤 Participez à la création de SAGBO, le premier assistant vocal en langue Fon ! C'est rapide (12 secondes) et facile. Votre voix compte ! 🌍";
+        const shareUrl = window.location.href;
+        
+        let shareLink;
+        
+        switch(platform) {
+            case 'facebook':
+                shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+                window.open(shareLink, '_blank', 'width=600,height=400');
+                break;
+            
+            case 'whatsapp':
+                shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`;
+                window.open(shareLink, '_blank');
+                break;
+            
+            case 'other':
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'SAGBO - Assistant Vocal Fon',
+                        text: shareText,
+                        url: shareUrl
+                    }).catch(console.error);
+                } else {
+                    // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+                    const tempInput = document.createElement('input');
+                    tempInput.value = shareUrl;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    alert('Lien copié dans le presse-papier !');
+                }
+                break;
+        }
+    }
 });
