@@ -61,8 +61,11 @@ header {
 
 .scrolling-texts {
     overflow: hidden;
-    height: 60px;
+    height: auto;
+    min-height: 60px;
     position: relative;
+    margin: 1rem 0;
+    padding: 0.5rem;
 }
 
 .scrolling-texts p {
@@ -71,16 +74,45 @@ header {
     text-align: center;
     animation: scrollText 12s infinite;
     opacity: 0;
+    margin: 0;
+    padding: 0 1rem;
+    font-size: 0.9rem;
 }
 
 .scrolling-texts p:nth-child(1) { animation-delay: 0s; }
 .scrolling-texts p:nth-child(2) { animation-delay: 4s; }
 .scrolling-texts p:nth-child(3) { animation-delay: 8s; }
 
+@media screen and (max-width: 768px) {
+    .scrolling-texts {
+        min-height: 80px;
+    }
+
+    .scrolling-texts p {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        padding: 0 0.5rem;
+    }
+
+    .hero h2 {
+        font-size: 1.4rem;
+        padding: 0 0.5rem;
+    }
+}
+
 @keyframes scrollText {
-    0%, 20% { opacity: 0; transform: translateY(20px); }
-    25%, 45% { opacity: 1; transform: translateY(0); }
-    50%, 100% { opacity: 0; transform: translateY(-20px); }
+    0%, 20% { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    25%, 45% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+    50%, 100% { 
+        opacity: 0; 
+        transform: translateY(-20px); 
+    }
 }
 
 /* Recording Options */
@@ -169,8 +201,7 @@ select {
 .controls-container {
     display: flex;
     justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 2rem;
 }
 
 .record-btn {
@@ -340,4 +371,116 @@ select {
 
 .close-btn:hover {
     background-color: var(--secondary-color);
+}
+
+/* Nouvelles sections */
+.phrases-section {
+    background-color: var(--white);
+    padding: 2rem;
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.current-phrase {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.phrase-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin: 1rem 0;
+}
+
+.recordings-list {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.recording-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--light-bg);
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.recording-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.recording-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.recording-actions button {
+    padding: 0.5rem;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--white);
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recording-actions button.delete-btn {
+    background-color: var(--error-color);
+}
+
+/* Styles pour le modal de permission microphone */
+.modal.mic-permission {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.permission-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.primary-btn {
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.primary-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Message de désactivation du micro */
+.mic-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }

@@ -12,18 +12,124 @@ document.addEventListener('DOMContentLoaded', () => {
     const environmentSelect = document.getElementById('environmentSelect');
     const playRecordingBtn = document.getElementById('playRecordingBtn');
     const submitBtn = document.getElementById('submitBtn');
+    const currentPhraseElement = document.getElementById('currentPhrase');
+    const currentPhraseNumber = document.getElementById('currentPhraseNumber');
+    const recordingsList = document.getElementById('recordingsList');
+
+    const micPermissionModal = document.getElementById('micPermissionModal');
+    const allowMicButton = document.getElementById('allowMicButton');
 
     // Variables d'état
     let isRecording = false;
     let currentExampleAudio = null;
+    const phrases = ['Appel_Nom', 'Phrase_2', 'Phrase_3', 'Phrase_4']; // Ajoutez vos phrases ici
+    let currentPhraseIndex = 0;
+    const recordings = new Map(); // Pour stocker les enregistrements
 
-    // Initialisation du recorder
-    audioRecorder.init().then(initialized => {
-        if (!initialized) {
-            alert('Erreur d\'accès au microphone. Veuillez vérifier les permissions.');
-            recordBtn.disabled = true;
+    // Afficher le modal de permission au démarrage
+    micPermissionModal.style.display = 'block';
+
+    // Gérer le clic sur le bouton d'autorisation
+    allowMicButton.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            micPermissionModal.style.display = 'none';
+            
+            // Initialiser le recorder avec le stream
+            const initialized = await audioRecorder.init();
+            if (!initialized) {
+                alert('Erreur d\'initialisation du microphone. Veuillez réessayer.');
+            }
+
+            // Afficher un message temporaire de confirmation
+            showMicStatus('✅ Microphone activé');
+        } catch (error) {
+            console.error('Erreur d\'accès au microphone:', error);
+            showMicStatus('❌ Erreur d\'accès au microphone', true);
         }
     });
+
+    // Fonction pour afficher les messages de statut du microphone
+    function showMicStatus(message, isError = false) {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'mic-status';
+        statusDiv.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
+        statusDiv.textContent = message;
+        document.body.appendChild(statusDiv);
+        statusDiv.style.display = 'block';
+
+        setTimeout(() => {
+            statusDiv.style.opacity = '0';
+            setTimeout(() => statusDiv.remove(), 300);
+        }, 3000);
+    }
+
+    // Gérer la fermeture de la page
+    window.addEventListener('beforeunload', () => {
+        if (audioRecorder.mediaRecorder && audioRecorder.mediaRecorder.stream) {
+            audioRecorder.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            showMicStatus('🎤 Microphone désactivé');
+        }
+    });
+
+    // Mettre à jour l'affichage de la phrase courante
+    function updateCurrentPhrase() {
+        currentPhraseElement.textContent = phrases[currentPhraseIndex];
+        currentPhraseNumber.textContent = (currentPhraseIndex + 1).toString();
+        submitBtn.innerHTML = `<i class="fas fa-check"></i> Valider et envoyer (${recordings.size}/4)`;
+    }
+
+    // Créer un élément d'enregistrement
+    function createRecordingElement(phrase, blob) {
+        const div = document.createElement('div');
+        div.className = 'recording-item';
+        div.innerHTML = `
+            <div class="recording-info">
+                <span>${phrase}</span>
+                <button class="play-btn" title="Écouter">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            <div class="recording-actions">
+                <button class="delete-btn" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+
+        // Gérer la lecture
+        const playBtn = div.querySelector('.play-btn');
+        let audio = new Audio(URL.createObjectURL(blob));
+        
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                audio.onended = () => {
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                };
+            } else {
+                audio.pause();
+                audio.currentTime = 0;
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        // Gérer la suppression
+        div.querySelector('.delete-btn').addEventListener('click', () => {
+            recordings.delete(phrase);
+            div.remove();
+            updateSubmitButton();
+        });
+
+        return div;
+    }
+
+    // Mettre à jour le bouton de validation
+    function updateSubmitButton() {
+        submitBtn.disabled = recordings.size !== 4;
+        submitBtn.innerHTML = `<i class="fas fa-check"></i> Valider et envoyer (${recordings.size}/4)`;
+    }
 
     // Gestion de l'exemple audio
     playExampleBtn.addEventListener('click', async () => {
@@ -36,8 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         playExampleBtn.innerHTML = '<i class="fas fa-stop"></i> Arrêter';
-        
-        currentExampleAudio = await audioRecorder.playExample(phraseSelect.value);
+        currentExampleAudio = await audioRecorder.playExample(phrases[currentPhraseIndex]);
         
         if (currentExampleAudio) {
             currentExampleAudio.addEventListener('timeupdate', () => {
@@ -55,13 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gestion de l'enregistrement
     recordBtn.addEventListener('click', async () => {
         if (!isRecording) {
-            // Démarrer l'enregistrement
             const started = audioRecorder.startRecording(
-                // Callback de mise à jour du timer
                 (elapsed) => {
                     timerDisplay.textContent = audioRecorder.formatTime(elapsed);
                 },
-                // Callback de fin d'enregistrement
                 (blob) => handleRecordingComplete(blob)
             );
 
@@ -83,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     stopBtn.addEventListener('click', () => {
-        audioRecorder.stopRecording();
+        if (isRecording) {
+            audioRecorder.stopRecording();
+        }
     });
 
     deleteBtn.addEventListener('click', () => {
@@ -95,12 +199,21 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleRecordingComplete(audioBlob) {
         if (!audioBlob) return;
         
-        // Activer les boutons de lecture et de validation
-        playRecordingBtn.disabled = false;
-        submitBtn.disabled = false;
+        const currentPhrase = phrases[currentPhraseIndex];
+        recordings.set(currentPhrase, audioBlob);
         
-        // Désactiver les boutons d'enregistrement
+        // Ajouter l'enregistrement à la liste
+        const recordingElement = createRecordingElement(currentPhrase, audioBlob);
+        recordingsList.appendChild(recordingElement);
+        
+        // Passer à la phrase suivante si possible
+        if (currentPhraseIndex < phrases.length - 1) {
+            currentPhraseIndex++;
+            updateCurrentPhrase();
+        }
+        
         updateUIForRecording(false);
+        updateSubmitButton();
     }
 
     // Écouter l'enregistrement
@@ -122,8 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gestion de la validation et de l'envoi
     submitBtn.addEventListener('click', async () => {
+        if (recordings.size !== 4) return;
+
         const metadata = {
-            phrase: phraseSelect.value,
             ageRange: ageSelect.value,
             environment: environmentSelect.value,
             timestamp: new Date().toISOString()
@@ -133,17 +247,16 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
             
-            // Envoi à Telegram
-            await telegramService.sendAudioToTelegram(audioRecorder.audioBlob, metadata);
+            // Envoyer chaque enregistrement
+            for (const [phrase, blob] of recordings) {
+                await telegramService.sendAudioToTelegram(blob, { ...metadata, phrase });
+            }
             
-            // Afficher le modal de remerciement
             showThankYouModal();
         } catch (error) {
             console.error('Erreur lors de l\'envoi:', error);
-            alert('Une erreur est survenue lors de l\'envoi de l\'enregistrement. Veuillez réessayer.');
+            alert('Une erreur est survenue lors de l\'envoi des enregistrements. Veuillez réessayer.');
             submitBtn.disabled = false;
-        } finally {
-            resetUI();
         }
     });
 
@@ -175,40 +288,17 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = '<i class="fas fa-check"></i> Valider et envoyer';
     }
 
-    // Gestion du modal de remerciement
+    // Fonctions pour gérer le modal
     function showThankYouModal() {
         const modal = document.getElementById('thankYouModal');
         modal.style.display = 'block';
     }
 
-    // Fonctions de partage
-    window.shareToSocial = function(platform) {
-        const message = "Participez à la création du premier assistant vocal en langue Fon ! 🎙️\n" +
-                       "Rendez-vous sur https://sirifon.bj pour contribuer.\n" +
-                       "#SiriFon #Bénin #IA #VoiceAssistant";
-
-        switch (platform) {
-            case 'facebook':
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://sirifon.bj')}`, '_blank');
-                break;
-            case 'whatsapp':
-                window.open(`whatsapp://send?text=${encodeURIComponent(message)}`, '_blank');
-                break;
-            case 'other':
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Siri Fon Bénin',
-                        text: message,
-                        url: 'https://sirifon.bj'
-                    });
-                }
-                break;
-        }
-    };
-
     window.closeThankYouModal = function() {
         const modal = document.getElementById('thankYouModal');
         modal.style.display = 'none';
+        // Optionnel : recharger la page pour recommencer
+        window.location.reload();
     };
 
     // Gestion du défilement des textes
@@ -227,4 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateScrollingText();
     // Changer le texte toutes les 4 secondes
     setInterval(updateScrollingText, 4000);
+
+    // Initialisation
+    updateCurrentPhrase();
 });
