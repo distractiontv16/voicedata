@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isRecording = false;
     let currentExampleAudio = null;
     const phrases = [
-        'Appel_Nom',
+        'Appel_(un de Nom votre choix)',
         'Decroche_Lappel',
         'Ouvre_Whatsap',
         'Ouvre_galerie'

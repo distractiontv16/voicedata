@@ -3,20 +3,19 @@ class TelegramService {
         // Le token de votre bot (à obtenir via @BotFather sur Telegram)
         this.BOT_TOKEN = '7892570628:AAFhbsYidVwBSeRKp1Taab1cTCEgmuIVjF8';
         
-        // L'ID de votre canal (par exemple: '@MonCanal' ou '-100xxxxxxxxxxxx')
-        // Pour un canal public, utilisez le format '@nomducanal'
-        // Pour un canal privé, utilisez l'ID numérique que vous pouvez obtenir en transmettant un message 
-        // du canal vers @getidsbot
-        this.CHANNEL_ID = '@voicedataa'; // Remplacez par votre canal
+        // Remplacer @voicedataa par l'ID numérique du canal
+        // L'ID doit commencer par -100 pour les canaux
+        this.CHANNEL_ID = '-1002358143119'; // Remplacez par l'ID de votre canal
     }
 
     async sendAudioToTelegram(audioBlob, metadata) {
         try {
+            console.log('Début de l\'envoi à Telegram:', metadata);
             const formData = new FormData();
             
             // Création d'un nom de fichier formaté
             const phraseNumber = {
-                'Appel_Nom': '01',
+                'Appel_(un de Nom votre choix)': '01',
                 'Decroche_Lappel': '02',
                 'Ouvre_Whatsap': '03',
                 'Ouvre_galerie': '04'
@@ -43,21 +42,24 @@ class TelegramService {
             formData.append('caption', caption);
 
             // Envoi à Telegram
+            console.log('Envoi de la requête à Telegram...');
             const response = await fetch(`https://api.telegram.org/bot${this.BOT_TOKEN}/sendAudio`, {
                 method: 'POST',
                 body: formData
             });
 
             const result = await response.json();
+            console.log('Réponse de Telegram:', result);
 
             if (!result.ok) {
+                console.error('Erreur Telegram:', result);
                 throw new Error(`Erreur d'envoi: ${result.description}`);
             }
 
             return true;
 
         } catch (error) {
-            console.error('Erreur lors de l\'envoi:', error);
+            console.error('Erreur détaillée lors de l\'envoi:', error);
             throw error;
         }
     }
