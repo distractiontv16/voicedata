@@ -36,7 +36,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gérer le clic sur le bouton d'autorisation
     allowMicButton.addEventListener('click', async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Vérifier si c'est un iPhone/iPad
+            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            if (isiOS) {
+                // Message spécifique pour iOS
+                showMicStatus('⚠️ Sur iPhone : autorisez le microphone dans les paramètres du navigateur', true);
+                
+                // Ajouter des instructions pour iOS
+                const iosInstructions = document.createElement('div');
+                iosInstructions.className = 'ios-instructions';
+                iosInstructions.innerHTML = `
+                    <p>Sur iPhone/iPad :</p>
+                    <ol>
+                        <li>Cliquez sur "Autoriser" quand le navigateur demande l'accès</li>
+                        <li>Si rien ne se passe, allez dans Réglages > Safari > Microphone</li>
+                        <li>Activez l'accès pour ce site</li>
+                        <li>Revenez et rafraîchissez la page</li>
+                    </ol>
+                    <button onclick="window.location.reload()" class="refresh-btn">
+                        <i class="fas fa-sync"></i> Rafraîchir la page
+                    </button>
+                `;
+                micPermissionModal.querySelector('.modal-body').appendChild(iosInstructions);
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    channelCount: 1,
+                    sampleRate: 44100,
+                    sampleSize: 16
+                }
+            });
+            
             micPermissionModal.style.display = 'none';
             
             // Initialiser le recorder avec le stream
@@ -45,11 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Erreur d\'initialisation du microphone. Veuillez réessayer.');
             }
 
-            // Afficher un message temporaire de confirmation
             showMicStatus('✅ Microphone activé');
         } catch (error) {
             console.error('Erreur d\'accès au microphone:', error);
-            showMicStatus('❌ Erreur d\'accès au microphone', true);
+            
+            if (error.name === 'NotAllowedError') {
+                showMicStatus('❌ Accès au microphone refusé. Veuillez autoriser l\'accès dans les paramètres de votre navigateur', true);
+            } else {
+                showMicStatus('❌ Erreur d\'accès au microphone. Veuillez réessayer', true);
+            }
         }
     });
 
@@ -58,14 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusDiv = document.createElement('div');
         statusDiv.className = 'mic-status';
         statusDiv.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
+        statusDiv.style.padding = '15px';
+        statusDiv.style.margin = '10px';
+        statusDiv.style.borderRadius = '8px';
+        statusDiv.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        statusDiv.style.zIndex = '1000';
+        statusDiv.style.position = 'fixed';
+        statusDiv.style.top = '20px';
+        statusDiv.style.left = '50%';
+        statusDiv.style.transform = 'translateX(-50%)';
+        statusDiv.style.maxWidth = '90%';
+        statusDiv.style.width = 'auto';
         statusDiv.textContent = message;
+        
         document.body.appendChild(statusDiv);
-        statusDiv.style.display = 'block';
-
+        
+        // Laisser le message d'erreur plus longtemps visible
         setTimeout(() => {
             statusDiv.style.opacity = '0';
             setTimeout(() => statusDiv.remove(), 300);
-        }, 3000);
+        }, isError ? 6000 : 3000);
     }
 
     // Gérer la fermeture de la page

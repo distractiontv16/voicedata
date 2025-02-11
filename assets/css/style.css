@@ -485,3 +485,34 @@ select {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Styles pour les instructions iOS */
+.ios-instructions {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.ios-instructions ol {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.ios-instructions li {
+    margin: 10px 0;
+}
+
+.refresh-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.refresh-btn:hover {
+    background-color: #0056b3;
+}
