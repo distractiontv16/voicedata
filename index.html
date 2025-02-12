@@ -4,9 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> SAGBO: Siri Fon Bénin</title>
-    <link rel="stylesheet" href="assets/css/style.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Charger les styles critiques en premier -->
+    <style>
+        /* Styles critiques pour le premier rendu */
+        :root {
+            --primary-color: #6200ee;
+            --secondary-color: #3700b3;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --white: #ffffff;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .hero h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+    </style>
+
+    <!-- Charger le CSS principal de manière optimisée -->
+    <link rel="preload" href="assets/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/css/style.css"></noscript>
+    
+    <!-- Charger le CSS responsive après -->
+    <link rel="preload" href="assets/css/responsive.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/css/responsive.css"></noscript>
+    
+    <!-- Charger Font Awesome de manière optimisée -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+          as="style" 
+          onload="this.onload=null;this.rel='stylesheet'"
+          crossorigin="anonymous">
+    <noscript>
+        <link rel="stylesheet" 
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+              crossorigin="anonymous">
+    </noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
       crossorigin="anonymous" 
       referrerpolicy="no-referrer"
@@ -26,10 +71,13 @@
     <main> 
         <section class="hero">
             <h2>🎙️ Participez à la création de "SAGBO" le premier assistant vocal en langue Fon ! 🌍</h2>
-            <div class="scrolling-texts" id="scrollingTexts">
+            <div class="instructions-texts" id="scrollingTexts">
                 <p>🎯 C'est rapide : 12 secondes, comme un vocal WhatsApp</p>
                 <p>🔒 Promis, c'est safe : pas de spam, pas de fuite de données</p>
-                <p>🎤 En 3 secondes chrono, enregistrez une phrase en Fon </p>
+                <p>🎤 En 3 secondes chrono, enregistrez une phrase en Fon</p>
+                <p>⚠️ Important : Prenez votre temps et parlez naturellement</p>
+                <p>🙏 Votre contribution est précieuse, merci de la faire sérieusement</p>
+                <p>🎯 Un enregistrement de qualité vaut mieux que dix faits à la va-vite</p>
             </div>
         </section>
 
@@ -63,6 +111,7 @@
             <div class="current-phrase">
                 <h3>Phrase à enregistrer (<span id="currentPhraseNumber">1</span>/4):</h3>
                 <p id="currentPhrase" class="phrase-text">Appel_Nom</p>
+                <p class="recording-instructions"></p>
                 <button id="playExampleBtn" class="example-btn">
                     <i class="fas fa-play"></i> Écouter l'exemple
                 </button>

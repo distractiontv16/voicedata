@@ -59,40 +59,32 @@ header {
     color: var(--primary-color);
 }
 
-.scrolling-texts {
-    overflow: hidden;
-    height: 40px;
-    position: relative;
-    margin: 0.5rem 0;
-    padding: 0;
-    white-space: nowrap;
+.instructions-texts {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.scrolling-texts p {
-    position: absolute;
-    width: 100%;
+.instructions-texts p {
+    font-size: 1.1rem;
+    margin: 15px 0;
+    padding: 10px;
     text-align: center;
-    animation: scrollText 9s infinite;
-    opacity: 0;
-    margin: 0;
-    padding: 0 1rem;
-    font-size: 0.9rem;
-    line-height: 40px;
-    top: 0;
+    color: var(--text-color);
+    border-bottom: 1px solid #eee;
 }
 
-.scrolling-texts p:nth-child(1) { animation-delay: 0s; }
-.scrolling-texts p:nth-child(2) { animation-delay: 3s; }
-.scrolling-texts p:nth-child(3) { animation-delay: 6s; }
+.instructions-texts p:last-child {
+    border-bottom: none;
+}
 
 @media screen and (max-width: 768px) {
-    .scrolling-texts {
-        height: 50px;
-    }
-
-    .scrolling-texts p {
-        font-size: 1.1rem;
-        line-height: 50px;
+    .instructions-texts p {
+        font-size: 1rem;
+        padding: 8px;
     }
 
     .hero h2 {
@@ -101,19 +93,14 @@ header {
     }
 }
 
-@keyframes scrollText {
-    0%, 20% { 
-        opacity: 0; 
-        transform: translateX(-100px);
-    }
-    25%, 45% { 
-        opacity: 1; 
-        transform: translateX(0);
-    }
-    50%, 100% { 
-        opacity: 0; 
-        transform: translateX(100px);
-    }
+.recording-instructions {
+    color: #e67e22;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 8px;
+    background-color: #fff3e0;
+    border-radius: 5px;
+    font-size: 0.9em;
 }
 
 /* Recording Options */
@@ -484,35 +471,4 @@ select {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-/* Styles pour les instructions iOS */
-.ios-instructions {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-}
-
-.ios-instructions ol {
-    margin: 15px 0;
-    padding-left: 20px;
-}
-
-.ios-instructions li {
-    margin: 10px 0;
-}
-
-.refresh-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.refresh-btn:hover {
-    background-color: #0056b3;
 }

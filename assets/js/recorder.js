@@ -4,25 +4,37 @@ class AudioRecorder {
         this.audioChunks = [];
         this.isRecording = false;
         this.isPaused = false;
-        this.maxDuration = 3000; // 3 secondes
+        this.maxDuration = 3150; // 3 secondes
         this.timer = null;
-        this.stream = null; // Ajout pour garder une référence au stream
+        this.stream = null;
     }
 
     async init() {
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
+            // Vérifier si c'est un iPhone/iPad
+            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            // Configuration spécifique pour iOS
+            const constraints = {
+                audio: isiOS ? true : {
                     channelCount: 1,
                     sampleRate: 44100,
                     sampleSize: 16
                 }
-            });
+            };
+
+            // Obtenir le flux audio
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
             
-            this.mediaRecorder = new MediaRecorder(this.stream, {
-                mimeType: 'audio/webm;codecs=opus',
-                audioBitsPerSecond: 128000
-            });
+            // Configuration spécifique pour iOS
+            if (isiOS) {
+                this.mediaRecorder = new MediaRecorder(this.stream);
+            } else {
+                this.mediaRecorder = new MediaRecorder(this.stream, {
+                    mimeType: 'audio/webm;codecs=opus',
+                    audioBitsPerSecond: 128000
+                });
+            }
             
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -30,9 +42,20 @@ class AudioRecorder {
                 }
             };
 
+            // Vérifier si le MediaRecorder est bien initialisé
+            if (!this.mediaRecorder) {
+                throw new Error('MediaRecorder non initialisé');
+            }
+
             return true;
         } catch (error) {
-            console.error('Erreur d\'initialisation du recorder:', error);
+            console.error('Erreur détaillée d\'initialisation:', error);
+            
+            // Nettoyer le stream si une erreur survient
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+            }
+            
             return false;
         }
     }

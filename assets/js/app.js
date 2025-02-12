@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Variables d'état
+    let isRecording = false;
+    let currentExampleAudio = null;
+    const phrases = [
+        'Appel_(un de Nom votre choix)',
+        'Decroche_Lappel',
+        'Ouvre_Whatsap',
+        'Ouvre_galerie'
+    ];
+    let currentPhraseIndex = 0;
+    const recordings = new Map(); // Pour stocker les enregistrements
+
     // Créer l'instance de AudioRecorder
     const audioRecorder = new AudioRecorder();
 
@@ -14,80 +26,217 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentPhraseElement = document.getElementById('currentPhrase');
     const currentPhraseNumber = document.getElementById('currentPhraseNumber');
     const recordingsList = document.getElementById('recordingsList');
-
     const micPermissionModal = document.getElementById('micPermissionModal');
     const allowMicButton = document.getElementById('allowMicButton');
 
-    // Variables d'état
-    let isRecording = false;
-    let currentExampleAudio = null;
-    const phrases = [
-        'Appel_(un de Nom votre choix)',
-        'Decroche_Lappel',
-        'Ouvre_Whatsap',
-        'Ouvre_galerie'
-    ];
-    let currentPhraseIndex = 0;
-    const recordings = new Map(); // Pour stocker les enregistrements
+    // Ajouter un objet pour les instructions spécifiques
+    const phraseInstructions = {
+        'Appel_(un de Nom votre choix)': '📢 Instructions : Placez le micro près de votre bouche (15-20cm). Utilisez un ton naturel et prononcez clairement un nom de votre choix (ex: Koffi, Jacques...)',
+        'Decroche_Lappel': '📢 Instructions : Soyez précis et clair ! Dites naturellement "décroche l\'appel" en Fon comme dans l\'exemple.',
+        'Ouvre_Whatsap': '📢 Instructions : Gardez une distance de 35cm entre vous et le micro. Prononcez "ouvre WhatsApp" en Fon avec un ton commandant mais votre ton naturel ',
+        'Ouvre_galerie': '📢 Instructions : Faites une brève pause avant de prononcer "galerie". Dites "ouvre la galerie" en Fon comme si vous parliez à un assistant vocal'
+    };
+
+    // Fonction de gestion de la permission du microphone
+    async function handleMicrophonePermission() {
+        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const modalContent = micPermissionModal.querySelector('.modal-content');
+
+        if (isiOS) {
+            modalContent.innerHTML = `
+                <h2 style="color: #6200ee; font-size: 1.8rem; margin-bottom: 20px;">
+                    🎤 Instructions pour iPhone/iPad
+                </h2>
+                <div class="modal-body ios-permission-instructions">
+                    <p style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 20px;">
+                        Pour activer le microphone sur iOS :
+                    </p>
+                    <ol class="ios-permission-steps">
+                        <li>
+                            <span class="ios-step-number">1</span>
+                            <strong>Appuyez sur le bouton "Autoriser"</strong> quand il apparaît
+                        </li>
+                        <li>
+                            <span class="ios-step-number">2</span>
+                            Si rien ne se passe, suivez ces étapes :
+                            <ol class="ios-permission-substeps">
+                                <li>Ouvrez les <strong>Réglages</strong> de votre iPhone</li>
+                                <li>Faites défiler jusqu'à <strong>Safari</strong></li>
+                                <li>Appuyez sur <strong>Réglages du site</strong></li>
+                                <li>Trouvez <strong>Microphone</strong></li>
+                                <li>Sélectionnez <strong>Autoriser</strong></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <span class="ios-step-number">3</span>
+                            Revenez à cette page et appuyez sur <strong>Recharger</strong>
+                        </li>
+                    </ol>
+                    <div class="ios-button-container">
+                        <button id="allowMicButton" class="ios-primary-btn">
+                            <i class="fas fa-microphone"></i> Autoriser le microphone
+                        </button>
+                        <button class="ios-refresh-btn" onclick="window.location.reload()">
+                            <i class="fas fa-sync"></i> Recharger la page
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        const allowMicButton = document.getElementById('allowMicButton');
+        allowMicButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const initialized = await audioRecorder.init();
+                
+                if (initialized) {
+                    micPermissionModal.style.display = 'none';
+                    showMicStatus('✅ Microphone activé et prêt à enregistrer');
+                } else {
+                    throw new Error('Échec de l\'initialisation');
+                }
+            } catch (error) {
+                console.error('Erreur d\'accès au microphone:', error);
+                
+                if (isiOS) {
+                    showMicStatus('⚠️ Veuillez vérifier les permissions du microphone dans les réglages Safari', true);
+                } else {
+                    showMicStatus('❌ Erreur d\'accès au microphone. Veuillez réessayer', true);
+                }
+            }
+        });
+    }
 
     // Afficher le modal de permission au démarrage
     micPermissionModal.style.display = 'block';
+    handleMicrophonePermission();
 
-    // Gérer le clic sur le bouton d'autorisation
-    allowMicButton.addEventListener('click', async () => {
-        try {
-            // Vérifier si c'est un iPhone/iPad
-            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            if (isiOS) {
-                // Message spécifique pour iOS
-                showMicStatus('⚠️ Sur iPhone : autorisez le microphone dans les paramètres du navigateur', true);
-                
-                // Ajouter des instructions pour iOS
-                const iosInstructions = document.createElement('div');
-                iosInstructions.className = 'ios-instructions';
-                iosInstructions.innerHTML = `
-                    <p>Sur iPhone/iPad :</p>
-                    <ol>
-                        <li>Cliquez sur "Autoriser" quand le navigateur demande l'accès</li>
-                        <li>Si rien ne se passe, allez dans Réglages > Safari > Microphone</li>
-                        <li>Activez l'accès pour ce site</li>
-                        <li>Revenez et rafraîchissez la page</li>
-                    </ol>
-                    <button onclick="window.location.reload()" class="refresh-btn">
-                        <i class="fas fa-sync"></i> Rafraîchir la page
-                    </button>
-                `;
-                micPermissionModal.querySelector('.modal-body').appendChild(iosInstructions);
+    // Ajouter le CSS correspondant
+    const style = document.createElement('style');
+    style.textContent = `
+        .ios-permission-instructions {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ios-permission-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ios-permission-steps > li {
+            margin: 25px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            position: relative;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .ios-step-number {
+            background-color: #6200ee;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .ios-permission-substeps {
+            margin: 15px 0 15px 35px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            border-left: 3px solid #6200ee;
+        }
+
+        .ios-permission-substeps li {
+            margin: 12px 0;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .ios-button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .ios-primary-btn {
+            background-color: #6200ee;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .ios-primary-btn:hover {
+            background-color: #5000ca;
+        }
+
+        .ios-refresh-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .ios-refresh-btn:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .ios-permission-instructions {
+                padding: 15px;
+                margin: 10px 0;
             }
 
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    channelCount: 1,
-                    sampleRate: 44100,
-                    sampleSize: 16
-                }
-            });
-            
-            micPermissionModal.style.display = 'none';
-            
-            // Initialiser le recorder avec le stream
-            const initialized = await audioRecorder.init();
-            if (!initialized) {
-                alert('Erreur d\'initialisation du microphone. Veuillez réessayer.');
+            .ios-permission-steps > li {
+                font-size: 1rem;
+                padding: 12px;
             }
 
-            showMicStatus('✅ Microphone activé');
-        } catch (error) {
-            console.error('Erreur d\'accès au microphone:', error);
-            
-            if (error.name === 'NotAllowedError') {
-                showMicStatus('❌ Accès au microphone refusé. Veuillez autoriser l\'accès dans les paramètres de votre navigateur', true);
-            } else {
-                showMicStatus('❌ Erreur d\'accès au microphone. Veuillez réessayer', true);
+            .ios-permission-substeps {
+                margin-left: 25px;
+                padding: 12px;
+            }
+
+            .ios-permission-substeps li {
+                font-size: 0.95rem;
             }
         }
-    });
+    `;
+    document.head.appendChild(style);
 
     // Fonction pour afficher les messages de statut du microphone
     function showMicStatus(message, isError = false) {
@@ -112,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Laisser le message d'erreur plus longtemps visible
         setTimeout(() => {
             statusDiv.style.opacity = '0';
-            setTimeout(() => statusDiv.remove(), 300);
+            setTimeout(() => statusDiv.remove(), 3000);
         }, isError ? 6000 : 3000);
     }
 
@@ -124,10 +273,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mettre à jour l'affichage de la phrase courante
+    // Modifier la fonction updateCurrentPhrase pour inclure les instructions spécifiques
     function updateCurrentPhrase() {
-        currentPhraseElement.textContent = phrases[currentPhraseIndex];
+        const currentPhrase = phrases[currentPhraseIndex];
+        currentPhraseElement.textContent = currentPhrase;
         currentPhraseNumber.textContent = (currentPhraseIndex + 1).toString();
+        
+        // Mettre à jour les instructions spécifiques
+        const instructionsElement = document.querySelector('.recording-instructions');
+        instructionsElement.textContent = phraseInstructions[currentPhrase];
+        
         updateSubmitButton();
     }
 
@@ -171,6 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
         div.querySelector('.delete-btn').addEventListener('click', () => {
             recordings.delete(phrase);
             div.remove();
+            
+            // Revenir à la phrase correspondante
+            currentPhraseIndex = phrases.indexOf(phrase);
+            updateCurrentPhrase();
             updateSubmitButton();
         });
 
@@ -221,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gestion de l'enregistrement
     recordBtn.addEventListener('click', async () => {
         if (!isRecording) {
-            const started = audioRecorder.startRecording(
+            const started = await audioRecorder.startRecording(
                 (elapsed) => {
                     timerDisplay.textContent = audioRecorder.formatTime(elapsed);
                 },
@@ -334,23 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Recharger la page pour recommencer
         window.location.reload();
     };
-
-    // Gestion du défilement des textes
-    const scrollingTexts = document.getElementById('scrollingTexts');
-    let currentTextIndex = 0;
-    const texts = scrollingTexts.children;
-
-    function updateScrollingText() {
-        for (let i = 0; i < texts.length; i++) {
-            texts[i].style.opacity = i === currentTextIndex ? '1' : '0';
-        }
-        currentTextIndex = (currentTextIndex + 1) % texts.length;
-    }
-
-    // Initialiser le premier texte
-    updateScrollingText();
-    // Changer le texte toutes les 4 secondes
-    setInterval(updateScrollingText, 4000);
 
     // Initialisation
     updateCurrentPhrase();
