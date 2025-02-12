@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentPhraseNumber = document.getElementById('currentPhraseNumber');
     const recordingsList = document.getElementById('recordingsList');
     const micPermissionModal = document.getElementById('micPermissionModal');
-    const allowMicButton = document.getElementById('allowMicButton');
+    const authorizeButton = document.getElementById('authorizeButton');
 
     // Ajouter un objet pour les instructions spécifiques
     const phraseInstructions = {
@@ -39,71 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fonction de gestion de la permission du microphone
     async function handleMicrophonePermission() {
-        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const modalContent = micPermissionModal.querySelector('.modal-content');
-
-        if (isiOS) {
-            modalContent.innerHTML = `
-                <h2 style="color: #6200ee; font-size: 1.8rem; margin-bottom: 20px;">
-                    🎤 Instructions pour iPhone/iPad
-                </h2>
-                <div class="modal-body ios-permission-instructions">
-                    <p style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 20px;">
-                        Pour activer le microphone sur iOS :
-                    </p>
-                    <ol class="ios-permission-steps">
-                        <li>
-                            <span class="ios-step-number">1</span>
-                            <strong>Appuyez sur le bouton "Autoriser"</strong> quand il apparaît
-                        </li>
-                        <li>
-                            <span class="ios-step-number">2</span>
-                            Si rien ne se passe, suivez ces étapes :
-                            <ol class="ios-permission-substeps">
-                                <li>Ouvrez les <strong>Réglages</strong> de votre iPhone</li>
-                                <li>Faites défiler jusqu'à <strong>Safari</strong></li>
-                                <li>Appuyez sur <strong>Réglages du site</strong></li>
-                                <li>Trouvez <strong>Microphone</strong></li>
-                                <li>Sélectionnez <strong>Autoriser</strong></li>
-                            </ol>
-                        </li>
-                        <li>
-                            <span class="ios-step-number">3</span>
-                            Revenez à cette page et appuyez sur <strong>Recharger</strong>
-                        </li>
-                    </ol>
-                    <div class="ios-button-container">
-                        <button id="allowMicButton" class="ios-primary-btn">
-                            <i class="fas fa-microphone"></i> Autoriser le microphone
-                        </button>
-                        <button class="ios-refresh-btn" onclick="window.location.reload()">
-                            <i class="fas fa-sync"></i> Recharger la page
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        const allowMicButton = document.getElementById('allowMicButton');
-        allowMicButton.addEventListener('click', async () => {
+        const authorizeButton = document.getElementById('authorizeButton');
+        
+        authorizeButton.addEventListener('click', async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const initialized = await audioRecorder.init();
-                
-                if (initialized) {
+                const success = await audioRecorder.init();
+                if (success) {
                     micPermissionModal.style.display = 'none';
-                    showMicStatus('✅ Microphone activé et prêt à enregistrer');
+                    showMicStatus('Microphone activé avec succès!', false);
                 } else {
-                    throw new Error('Échec de l\'initialisation');
+                    throw new Error('Échec de l\'initialisation du microphone');
                 }
             } catch (error) {
-                console.error('Erreur d\'accès au microphone:', error);
-                
-                if (isiOS) {
-                    showMicStatus('⚠️ Veuillez vérifier les permissions du microphone dans les réglages Safari', true);
-                } else {
-                    showMicStatus('❌ Erreur d\'accès au microphone. Veuillez réessayer', true);
-                }
+                console.error('Erreur lors de l\'accès au microphone:', error);
+                showMicStatus('Erreur lors de l\'accès au microphone. Veuillez vérifier vos paramètres.', true);
             }
         });
     }
@@ -111,132 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Afficher le modal de permission au démarrage
     micPermissionModal.style.display = 'block';
     handleMicrophonePermission();
-
-    // Ajouter le CSS correspondant
-    const style = document.createElement('style');
-    style.textContent = `
-        .ios-permission-instructions {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .ios-permission-steps {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .ios-permission-steps > li {
-            margin: 25px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            position: relative;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .ios-step-number {
-            background-color: #6200ee;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .ios-permission-substeps {
-            margin: 15px 0 15px 35px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            border-left: 3px solid #6200ee;
-        }
-
-        .ios-permission-substeps li {
-            margin: 12px 0;
-            color: #333;
-            font-size: 1rem;
-        }
-
-        .ios-button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        .ios-primary-btn {
-            background-color: #6200ee;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-
-        .ios-primary-btn:hover {
-            background-color: #5000ca;
-        }
-
-        .ios-refresh-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-
-        .ios-refresh-btn:hover {
-            background-color: #45a049;
-        }
-
-        @media (max-width: 768px) {
-            .ios-permission-instructions {
-                padding: 15px;
-                margin: 10px 0;
-            }
-
-            .ios-permission-steps > li {
-                font-size: 1rem;
-                padding: 12px;
-            }
-
-            .ios-permission-substeps {
-                margin-left: 25px;
-                padding: 12px;
-            }
-
-            .ios-permission-substeps li {
-                font-size: 0.95rem;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 
     // Fonction pour afficher les messages de statut du microphone
     function showMicStatus(message, isError = false) {
@@ -269,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('beforeunload', () => {
         if (audioRecorder.mediaRecorder && audioRecorder.mediaRecorder.stream) {
             audioRecorder.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            showMicStatus('🎤 Microphone désactivé');
+            showMicStatus('Microphone désactivé');
         }
     });
 

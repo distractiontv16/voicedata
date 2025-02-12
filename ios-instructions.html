@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructions iOS - SAGBO Siri Fon</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .instructions-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .instruction-step {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #6200ee;
+        }
+
+        .ios-step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #6200ee;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .ios-permission-substeps {
+            margin-left: 45px;
+            margin-top: 1.5rem;
+        }
+
+        .ios-permission-substeps li {
+            margin-bottom: 1rem;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .important-note {
+            background: #ffe1e1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #ff4444;
+        }
+
+        .tip {
+            background: #e1f5fe;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #00b0ff;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .primary-button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            background-color: #6200ee;
+            color: white;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .primary-button:hover {
+            background-color: #3700b3;
+        }
+
+        .icon-step {
+            color: #6200ee;
+            margin-right: 8px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <h1> "SAGBO" Siri Fon Bénin</h1>
+            </div>
+        </nav>
+    </header>
+
+    <div class="instructions-container">
+        <h1 style="color: #6200ee; text-align: center; margin-bottom: 2rem;">
+            🎤 Autorisation du Microphone sur Mac/iOS
+        </h1>
+
+        <div class="important-note">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Important :</strong> Pour utiliser le site, vous devez d'abord autoriser l'accès au microphone.
+        </div>
+        
+        <div class="instruction-step">
+            <h3>
+                <span class="ios-step-number">1</span>
+                Accéder aux Préférences Système
+            </h3>
+            <div class="ios-permission-substeps">
+                <li>
+                    <i class="fab fa-apple icon-step"></i>
+                    Cliquez sur le menu Apple <strong>(logo Apple)</strong> dans le coin supérieur gauche de votre écran
+                </li>
+                <li>
+                    <i class="fas fa-cog icon-step"></i>
+                    Sélectionnez <strong>"Préférences Système"</strong>
+                </li>
+            </div>
+        </div>
+
+        <div class="instruction-step">
+            <h3>
+                <span class="ios-step-number">2</span>
+                Configuration de la Confidentialité
+            </h3>
+            <div class="ios-permission-substeps">
+                <li>
+                    <i class="fas fa-shield-alt icon-step"></i>
+                    Cliquez sur <strong>"Sécurité et confidentialité"</strong>
+                </li>
+                <li>
+                    <i class="fas fa-user-shield icon-step"></i>
+                    Sélectionnez l'onglet <strong>"Confidentialité"</strong>
+                </li>
+            </div>
+        </div>
+
+        <div class="instruction-step">
+            <h3>
+                <span class="ios-step-number">3</span>
+                Autorisation du Microphone
+            </h3>
+            <div class="ios-permission-substeps">
+                <li>
+                    <i class="fas fa-microphone icon-step"></i>
+                    Dans la barre latérale gauche, cliquez sur <strong>"Microphone"</strong>
+                </li>
+                <li>
+                    <i class="fas fa-check-square icon-step"></i>
+                    Cochez la case à côté de votre navigateur (Safari, Chrome, Firefox...)
+                </li>
+            </div>
+        </div>
+
+        <div class="tip">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Astuce :</strong> Si vous ne voyez pas votre navigateur dans la liste, essayez d'abord d'accéder à notre site avec ce navigateur. Une demande d'autorisation apparaîtra automatiquement.
+        </div>
+
+        <div class="button-container">
+            <a href="index.html" class="primary-button">
+                <i class="fas fa-microphone"></i> Retour à l'enregistrement
+            </a>
+        </div>
+    </div>
+</body>
+</html>
