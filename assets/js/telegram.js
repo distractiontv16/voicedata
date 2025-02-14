@@ -1,11 +1,11 @@
 class TelegramService {
     constructor() {
         // Le token de votre bot (à obtenir via @BotFather sur Telegram)
-        this.BOT_TOKEN = '7892570628:AAFhbsYidVwBSeRKp1Taab1cTCEgmuIVjF8';
+        this.BOT_TOKEN = '8180592246:AAGk3-NhJbtCf4dsCmgabEfj2gJAVVt-Kls';
         
         // Remplacer @voicedataa par l'ID numérique du canal
         // L'ID doit commencer par -100 pour les canaux
-        this.CHANNEL_ID = '-1002358143119'; // Remplacez par l'ID de votre canal
+        this.CHANNEL_ID = '-1002294990066'; // Remplacez par l'ID de votre canal
     }
 
     async sendAudioToTelegram(audioBlob, metadata) {
