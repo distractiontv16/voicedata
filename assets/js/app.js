@@ -1,12 +1,50 @@
+document.addEventListener('DOMContentLoaded', function() {
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-pair');
+    const indicators = document.querySelectorAll('.indicator');
+    const slideCount = slides.length;
+    let slideInterval;
+
+    function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        slides[index].classList.add('active');
+        indicators[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function nextSlide() {
+        showSlide((currentSlide + 1) % slideCount);
+    }
+
+    // Auto-rotation toutes les 4 secondes
+    function startSlideShow() {
+        slideInterval = setInterval(nextSlide, 4000);
+    }
+
+    // Event listeners pour les indicateurs
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            clearInterval(slideInterval);
+            showSlide(index);
+            startSlideShow();
+        });
+    });
+
+    // Démarrer le slideshow
+    startSlideShow();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // Variables d'état
     let isRecording = false;
     let currentExampleAudio = null;
     const phrases = [
-        'Appel_(un de Nom votre choix)',
-        'Decroche_Lappel',
-        'Ouvre_Whatsap',
-        'Ouvre_galerie'
+        'Appel+(un de Nom votre choix)',
+        'Decroche+Lappel',
+        'Ouvre+Whatsap',
+        'Ouvre+galerie'
     ];
     let currentPhraseIndex = 0;
     const recordings = new Map(); // Pour stocker les enregistrements
@@ -31,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ajouter un objet pour les instructions spécifiques
     const phraseInstructions = {
-        'Appel_(un de Nom votre choix)': '📢 Instructions : Placez le micro près de votre bouche (15-20cm). Utilisez un ton naturel et prononcez clairement un nom de votre choix (ex: Koffi, Jacques...)',
-        'Decroche_Lappel': '📢 Instructions : Soyez précis et clair ! Dites naturellement "décroche l\'appel" en Fon comme dans l\'exemple.',
-        'Ouvre_Whatsap': '📢 Instructions : Gardez une distance de 35cm entre vous et le micro. Prononcez "ouvre WhatsApp" en Fon avec un ton commandant mais votre ton naturel ',
-        'Ouvre_galerie': '📢 Instructions : Faites une brève pause avant de prononcer "galerie". Dites "ouvre la galerie" en Fon comme si vous parliez à un assistant vocal'
+        'Appel+(un de Nom votre choix)': '📢 Instructions : Placez le micro près de votre bouche (15-20cm). Utilisez un ton naturel et prononcez clairement en Fongbé, avec un nom de votre choix (ex: Koffi, Jacques...)',
+        'Decroche+Lappel': '📢 Instructions : Soyez précis et clair ! Dites naturellement "décroche l\'appel" en Fongbé comme dans l\'exemple.',
+        'Ouvre+Whatsap': '📢 Instructions : Gardez une distance de 35cm entre vous et le micro. Prononcez "ouvre WhatsApp" en Fongbé avec un ton commandant mais votre ton naturel ',
+        'Ouvre+galerie': '📢 Instructions : Faites une brève pause avant de prononcer "galerie". Dites "ouvre la galerie" en Fongbé comme si vous parliez à un assistant vocal'
     };
 
     // Fonction de gestion de la permission du microphone

@@ -533,3 +533,62 @@ select {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Styles pour le carousel */
+.instructions-carousel {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    padding: 20px;
+}
+
+.slides-container {
+    overflow: hidden;
+    position: relative;
+    min-height: 120px;
+}
+
+.slide-pair {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+    transform: translateY(20px);
+}
+
+.slide-pair.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.slide-pair p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.carousel-controls {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.indicator.active {
+    background-color: var(--primary-color);
+}

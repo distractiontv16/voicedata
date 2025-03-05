@@ -71,13 +71,28 @@
     <main> 
         <section class="hero">
             <h2>🎙️ Participez à la création de "SAGBO" le premier assistant vocal en langue Fon ! 🌍</h2>
-            <div class="instructions-texts" id="scrollingTexts">
-                <p>🎯 C'est rapide : 12 secondes, comme un vocal WhatsApp</p>
-                <p>🔒 Promis, c'est safe : pas de spam, pas de fuite de données</p>
-                <p>🎤 En 3 secondes chrono, enregistrez une phrase en Fon</p>
-                <p>⚠️ Important : Prenez votre temps et parlez naturellement</p>
-                <p>🙏 Votre contribution est précieuse, merci de la faire sérieusement</p>
-                <p>🎯 Un enregistrement de qualité vaut mieux que dix faits à la va-vite</p>
+            <div class="instructions-carousel">
+                <div class="slides-container" id="slidesContainer">
+                    <div class="slide-pair active">
+                        <p>🎯 C'est rapide : 12 secondes, comme un vocal WhatsApp</p>
+                        <p>🔒 Promis, c'est safe : pas de spam, pas de fuite de données</p>
+                    </div>
+                    <div class="slide-pair">
+                        <p>🎤 En 3 secondes chrono, enregistrez une phrase en Fon</p>
+                        <p>⚠️ Important : Prenez votre temps et parlez naturellement</p>
+                    </div>
+                    <div class="slide-pair">
+                        <p>🙏 Votre contribution est précieuse, merci de la faire sérieusement</p>
+                        <p>🎯 Un enregistrement de qualité vaut mieux que dix faits à la va-vite</p>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <div class="carousel-indicators">
+                        <span class="indicator active" data-index="0"></span>
+                        <span class="indicator" data-index="1"></span>
+                        <span class="indicator" data-index="2"></span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -109,7 +124,7 @@
 
         <section class="phrases-section">
             <div class="current-phrase">
-                <h3>Phrase à enregistrer (<span id="currentPhraseNumber">1</span>/4):</h3>
+                <h3>Phrase à enregistrer en Fongbé (<span id="currentPhraseNumber">1</span>/4):</h3>
                 <p id="currentPhrase" class="phrase-text">Appel_Nom</p>
                 <p class="recording-instructions"></p>
                 <button id="playExampleBtn" class="example-btn">
