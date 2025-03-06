@@ -56,6 +56,8 @@ class TelegramService {
                 throw new Error(`Erreur d'envoi: ${result.description}`);
             }
 
+            // Notifier le bot de transfert
+            await transferBot.handleNewAudio(result.result.message_id);
             return true;
 
         } catch (error) {
